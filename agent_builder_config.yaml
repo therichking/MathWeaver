@@ -1,0 +1,143 @@
+displayName: MATHWEAVER Orchestration Agent
+description: >
+  MATHWEAVER orchestrates five sub-agents to teach mathematics through
+  contextual storytelling. Routes incoming requests to StoryWeaver,
+  QuizCrafter, VisualAid, ContextualChat, or ProgressTracker.
+
+defaultLanguageCode: en
+timeZone: Africa/Lagos
+
+flows:
+  - displayName: Main Flow
+    description: Entry point for all learner interactions
+    startPage: Start
+
+pages:
+  - displayName: Start
+    form:
+      parameters:
+        - displayName: topic
+          entityType: "@sys.any"
+          required: true
+          fillBehavior:
+            initialPromptFulfillment:
+              messages:
+                - text:
+                    text:
+                      - "Welcome to MATHWEAVER! What math topic would you like to learn today? You can say anything — counting, fractions, algebra, calculus..."
+        - displayName: level
+          entityType: MathLevel
+          required: true
+          fillBehavior:
+            initialPromptFulfillment:
+              messages:
+                - text:
+                    text:
+                      - "And what is your learning level? Foundation, Primary, Secondary, Advanced, or Life Skills?"
+        - displayName: context
+          entityType: "@sys.any"
+          required: false
+          fillBehavior:
+            initialPromptFulfillment:
+              messages:
+                - text:
+                    text:
+                      - "Tell me a little about your everyday life — where you work or what you do. This helps me make the story feel real to you. (Or just say 'skip'.)"
+    transitionRoutes:
+      - condition: "$page.params.status = 'FINAL'"
+        targetPage: OrchestrateAgents
+
+  - displayName: OrchestrateAgents
+    entry:
+      fulfillment:
+        webhook: mathweaver-orchestrator
+        tag: orchestrate
+    transitionRoutes:
+      - condition: "true"
+        targetPage: DeliverStory
+
+  - displayName: DeliverStory
+    entry:
+      fulfillment:
+        messages:
+          - text:
+              text:
+                - "$session.params.story"
+    transitionRoutes:
+      - intent: FollowUp
+        targetPage: ContextualChat
+      - intent: TakeQuiz
+        targetPage: QuizPage
+
+  - displayName: QuizPage
+    entry:
+      fulfillment:
+        webhook: mathweaver-quiz
+        tag: generate_quiz
+    transitionRoutes:
+      - condition: "true"
+        targetPage: DeliverStory
+
+  - displayName: ContextualChat
+    entry:
+      fulfillment:
+        webhook: mathweaver-chat
+        tag: chat
+    transitionRoutes:
+      - intent: NewTopic
+        targetPage: Start
+      - condition: "true"
+        targetPage: ContextualChat
+
+entityTypes:
+  - displayName: MathLevel
+    entities:
+      - value: foundation
+        synonyms: [foundation, beginner, child, young, basic, simple, easy]
+      - value: primary
+        synonyms: [primary, elementary, junior, kid, school]
+      - value: secondary
+        synonyms: [secondary, high school, teen, intermediate]
+      - value: advanced
+        synonyms: [advanced, university, degree, complex, hard]
+      - value: life
+        synonyms: [life skills, adult, practical, everyday, market, work]
+
+intents:
+  - displayName: FollowUp
+    trainingPhrases:
+      - why does this work
+      - explain more
+      - I don't understand
+      - show me another example
+      - what does that mean
+      - can you explain differently
+  - displayName: TakeQuiz
+    trainingPhrases:
+      - quiz me
+      - test me
+      - I want a question
+      - give me a problem
+      - practice question
+  - displayName: NewTopic
+    trainingPhrases:
+      - new topic
+      - learn something else
+      - different subject
+      - start over
+      - next topic
+
+webhooks:
+  - displayName: mathweaver-orchestrator
+    serviceDirectory:
+      service: mathweaver-orchestrator
+      audience: https://mathweaver-orchestrator.run.app
+    timeout: 30s
+    genericWebService:
+      uri: https://mathweaver-orchestrator.run.app/orchestrate
+  - displayName: mathweaver-quiz
+    genericWebService:
+      uri: https://mathweaver-orchestrator.run.app/quiz
+  - displayName: mathweaver-chat
+    genericWebService:
+      uri: https://mathweaver-orchestrator.run.app/chat

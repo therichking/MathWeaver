@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MATHWEAVER — Math Through Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1209;
+    --paper: #faf6ee;
+    --paper2: #f3eddf;
+    --paper3: #e8dfc8;
+    --gold: #c9843a;
+    --gold-light: #f0c878;
+    --gold-pale: #fdf3de;
+    --teal: #2d7d6f;
+    --teal-light: #4aada0;
+    --teal-pale: #e0f3f0;
+    --rust: #b84b2f;
+    --rust-pale: #faeae5;
+    --muted: #6b5e48;
+    --border: #d4c8ae;
+    --radius: 12px;
+    --radius-sm: 6px;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Parchment texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === HEADER === */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper2);
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    gap: 1rem;
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .logo-mark {
+    font-family: 'Lora', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+  }
+  .logo-sub {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .header-tagline {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.875rem;
+    color: var(--muted);
+    display: none;
+  }
+  @media (min-width: 600px) { .header-tagline { display: block; } }
+
+  /* === HERO === */
+  .hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 3.5rem 2rem 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-pale);
+    border: 1px solid var(--teal-light);
+    border-radius: 99px;
+    padding: 0.3rem 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  /* === LEVEL SELECTOR === */
+  .level-selector {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+    padding: 0 2rem;
+  }
+  .level-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    text-align: center;
+  }
+  .levels {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .level-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--paper);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .level-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .level-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+    font-weight: 600;
+  }
+
+  /* === MAIN LAYOUT === */
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 780px) {
+    .main { grid-template-columns: 1fr; }
+  }
+
+  /* === PANEL === */
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-header {
+    background: var(--paper2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .panel-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .panel-icon.gold { background: var(--gold-pale); color: var(--gold); }
+  .panel-icon.teal { background: var(--teal-pale); color: var(--teal); }
+  .panel-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+  }
+  .panel-body { padding: 1.25rem; }
+
+  /* === TOPIC INPUT === */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .topic-chip {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    line-height: 1.3;
+  }
+  .topic-chip:hover { border-color: var(--gold); background: var(--gold-pale); }
+  .topic-chip.active { border-color: var(--gold); background: var(--gold-pale); font-weight: 500; }
+
+  .input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .topic-input {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .topic-input:focus { border-color: var(--gold); }
+  .topic-input::placeholder { color: var(--muted); opacity: 0.7; }
+
+  .context-area {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--ink);
+    outline: none;
+    resize: vertical;
+    min-height: 60px;
+    margin-bottom: 0.75rem;
+    transition: border-color 0.15s;
+  }
+  .context-area:focus { border-color: var(--teal-light); }
+  .context-area::placeholder { color: var(--muted); opacity: 0.7; }
+
+  .context-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  .weave-btn {
+    width: 100%;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    font-style: italic;
+    padding: 0.8rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--gold);
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .weave-btn:hover { background: #b8732e; transform: translateY(-1px); }
+  .weave-btn:active { transform: translateY(0); }
+  .weave-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* === STORY OUTPUT === */
+  .story-area {
+    min-height: 220px;
+    position: relative;
+  }
+  .story-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    color: var(--muted);
+    opacity: 0.5;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .story-placeholder-icon { font-size: 2.5rem; opacity: 0.5; }
+  .story-placeholder-text { font-size: 0.85rem; font-style: italic; }
+
+  .story-content {
+    font-family: 'Lora', serif;
+    font-size: 0.97rem;
+    line-height: 1.85;
+    color: var(--ink);
+  }
+  .story-content h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin: 1.2rem 0 0.5rem;
+    font-family: 'Lora', serif;
+  }
+  .story-content h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--teal);
+    margin: 1rem 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .story-content p { margin-bottom: 0.9rem; }
+  .story-content strong { color: var(--gold); font-weight: 700; }
+  .story-content em { color: var(--teal); font-style: italic; }
+  .story-content .math-box {
+    background: var(--paper2);
+    border: 1.5px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--rust);
+  }
+
+  /* === QUIZ PANEL === */
+  .quiz-question {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .quiz-option {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 0.7rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .quiz-option:hover:not(:disabled) { border-color: var(--gold); background: var(--gold-pale); }
+  .quiz-option.correct { border-color: var(--teal); background: var(--teal-pale); color: var(--teal); font-weight: 600; }
+  .quiz-option.wrong { border-color: var(--rust); background: var(--rust-pale); color: var(--rust); }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-explanation {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--muted);
+    font-style: italic;
+    padding: 0.75rem;
+    background: var(--paper2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+
+  /* === VISUAL PANEL === */
+  .visual-panel { grid-column: 1 / -1; }
+  .visual-content {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .visual-card {
+    flex: 1;
+    min-width: 200px;
+    background: var(--paper2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    text-align: center;
+  }
+  .visual-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+  .visual-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .visual-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* === FOLLOW-UP CHAT === */
+  .chat-area {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-right: 0.25rem;
+  }
+  .chat-area::-webkit-scrollbar { width: 4px; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .chat-msg {
+    max-width: 90%;
+    padding: 0.6rem 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+  .chat-msg.user {
+    align-self: flex-end;
+    background: var(--gold);
+    color: white;
+    font-weight: 500;
+  }
+  .chat-msg.ai {
+    align-self: flex-start;
+    background: var(--paper2);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-family: 'Lora', serif;
+    font-size: 0.88rem;
+  }
+  .chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .chat-input {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    padding: 0.6rem 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--ink);
+    outline: none;
+  }
+  .chat-input:focus { border-color: var(--teal-light); }
+  .chat-send {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--teal);
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .chat-send:hover { background: #235e53; }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* === PROGRESS BAR === */
+  .progress-strip {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto 1.5rem;
+    padding: 0 2rem;
+  }
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .progress-bar-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--teal-light));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* === LOADING === */
+  .loading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    color: var(--muted);
+    font-style: italic;
+    font-family: 'Lora', serif;
+    font-size: 0.9rem;
+  }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* === API KEY NOTICE === */
+  .api-notice {
+    background: var(--rust-pale);
+    border: 1px solid var(--rust);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: var(--rust);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+  .api-key-input {
+    width: 100%;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    padding: 0.55rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--ink);
+    outline: none;
+    margin-top: 0.4rem;
+  }
+  .api-key-input:focus { border-color: var(--gold); }
+
+  /* === ARCHITECTURE DIAGRAM === */
+  .arch-panel { grid-column: 1 / -1; }
+  .arch-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+  .arch-node {
+    background: var(--paper2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    min-width: 140px;
+    flex: 1;
+    text-align: center;
+  }
+  .arch-node.gold-node { border-color: var(--gold); background: var(--gold-pale); }
+  .arch-node.teal-node { border-color: var(--teal-light); background: var(--teal-pale); }
+  .arch-node-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.2rem; }
+  .arch-node-name { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; }
+  .arch-node-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+  .arch-arrow { align-self: center; color: var(--gold); font-size: 1.2rem; flex-shrink: 0; }
+
+  /* === STREAK / GAMIFICATION === */
+  .streak-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: var(--gold-pale);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gold-light);
+    margin-bottom: 0.75rem;
+  }
+  .streak-fire { font-size: 1.2rem; }
+  .streak-text { font-size: 0.82rem; font-weight: 600; color: var(--gold); }
+  .xp-pill {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--gold);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+  }
+
+  /* === FOOTER === */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 1.5rem 2rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+  .footer-badges {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+  .footer-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* scroll reveal */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeUp 0.35s ease forwards; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">MATHWEAVER</span>
+      <span class="logo-sub">Math Through Story</span>
+    </div>
+    <span class="header-tagline">Every number has a story. Every story has a lesson.</span>
+    <div id="headerStreak" style="display:none; font-size:0.8rem; font-weight:600; color:var(--gold);">🔥 <span id="streakCount">0</span> day streak</div>
+  </div>
+</header>
+
+<div class="hero">
+  <span class="hero-badge">✦ Google Cloud Rapid Agent Hackathon 2025</span>
+  <h1>Learn <span>Mathematics</span><br/>through living stories</h1>
+  <p>From counting to calculus — MATHWEAVER transforms any mathematical concept into an immersive story using your everyday world, powered by Gemini AI.</p>
+</div>
+
+<!-- Level Selector -->
+<div class="level-selector">
+  <div class="level-label">Choose your level</div>
+  <div class="levels">
+    <button class="level-btn active" data-level="foundation" onclick="setLevel(this)">🌱 Foundation (Ages 3–7)</button>
+    <button class="level-btn" data-level="primary" onclick="setLevel(this)">📚 Primary (Ages 8–12)</button>
+    <button class="level-btn" data-level="secondary" onclick="setLevel(this)">🎯 Secondary (Ages 13–17)</button>
+    <button class="level-btn" data-level="advanced" onclick="setLevel(this)">🔥 Advanced (University)</button>
+    <button class="level-btn" data-level="life" onclick="setLevel(this)">🌍 Life Skills (Any Age)</button>
+  </div>
+</div>
+
+<!-- Progress strip -->
+<div class="progress-strip">
+  <div class="progress-stats">
+    <span>Stories woven: <strong id="storyCount">0</strong></span>
+    <span>Questions answered: <strong id="questionCount">0</strong></span>
+    <span>XP: <strong id="xpDisplay">0</strong></span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div class="main">
+
+  <!-- Input Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-icon gold">✦</div>
+      <span class="panel-title">Weave a Math Story</span>
+    </div>
+    <div class="panel-body">
+
+      <!-- Gemini API Key -->
+      <div class="api-notice" id="apiNotice">
+        <strong>Enter your Gemini API Key</strong> to power MATHWEAVER.<br/>
+        Get one free at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:inherit;text-decoration:underline;">aistudio.google.com</a>
+        <input type="password" class="api-key-input" id="apiKeyInput" placeholder="AIzaSy..." oninput="saveKey(this.value)" />
+      </div>
+
+      <!-- Streak bar -->
+      <div class="streak-bar" id="streakBar" style="display:none">
+        <span class="streak-fire">🔥</span>
+        <span class="streak-text" id="streakText">Keep going!</span>
+        <span class="xp-pill" id="xpPill">0 XP</span>
+      </div>
+
+      <!-- Quick topic chips -->
+      <div style="margin-bottom:0.5rem">
+        <span class="context-label">Quick topics</span>
+        <div class="topic-grid" id="topicGrid"></div>
+      </div>
+
+      <!-- Custom topic -->
+      <span class="context-label">Or type your own topic</span>
+      <div class="input-row">
+        <input type="text" class="topic-input" id="topicInput" placeholder="e.g. fractions, calculus, probability..." />
+      </div>
+
+      <!-- Context / everyday setting -->
+      <span class="context-label">Everyday context (optional)</span>
+      <textarea class="context-area" id="contextInput" placeholder="e.g. I sell tomatoes at the market. I'm a tailor. I'm a student who likes football..."></textarea>
+
+      <button class="weave-btn" id="weaveBtn" onclick="weaveStory()">✦ Weave My Math Story</button>
+    </div>
+  </div>
+
+  <!-- Story Output Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-icon gold">📖</div>
+      <span class="panel-title">Your Math Story</span>
+    </div>
+    <div class="panel-body story-area">
+      <div class="story-placeholder" id="storyPlaceholder">
+        <span class="story-placeholder-icon">📜</span>
+        <span class="story-placeholder-text">Your story will appear here…</span>
+      </div>
+      <div id="storyLoading" class="loading-wrap" style="display:none">
+        <div class="spinner"></div>
+        <span>Weaving your story with Gemini…</span>
+      </div>
+      <div class="story-content" id="storyContent" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Quiz Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-icon teal">🎯</div>
+      <span class="panel-title">Test Your Understanding</span>
+    </div>
+    <div class="panel-body">
+      <div id="quizPlaceholder" style="color:var(--muted);font-size:0.85rem;font-style:italic;padding:1rem 0;text-align:center;opacity:0.6;">
+        Generate a story first to unlock the quiz
+      </div>
+      <div id="quizLoading" class="loading-wrap" style="display:none">
+        <div class="spinner"></div>
+        <span>Crafting your question…</span>
+      </div>
+      <div id="quizContent" style="display:none">
+        <div class="quiz-question" id="quizQuestion"></div>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-explanation" id="quizExplanation" style="display:none"></div>
+        <button class="weave-btn" id="nextQuizBtn" style="display:none;background:var(--teal);margin-top:0.75rem" onclick="nextQuestion()">→ Next Question</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow-up Chat Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-icon teal">💬</div>
+      <span class="panel-title">Ask Anything</span>
+    </div>
+    <div class="panel-body">
+      <div class="chat-area" id="chatArea">
+        <div class="chat-msg ai">Hello! Generate a math story and then ask me any question about the concept. I'll explain it using more stories and real-world examples. 🌟</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Why does this work? Show me another example…" onkeydown="if(event.key==='Enter') sendChat()" />
+        <button class="chat-send" id="chatSendBtn" onclick="sendChat()">Ask →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Aid Panel -->
+  <div class="panel visual-panel" id="visualPanel" style="display:none">
+    <div class="panel-header">
+      <div class="panel-icon gold">📊</div>
+      <span class="panel-title">Visual Representation</span>
+    </div>
+    <div class="panel-body">
+      <div class="visual-content" id="visualContent"></div>
+    </div>
+  </div>
+
+  <!-- Architecture Panel (shown on load) -->
+  <div class="panel arch-panel" id="archPanel">
+    <div class="panel-header">
+      <div class="panel-icon teal">🏗</div>
+      <span class="panel-title">Agent Architecture — How MATHWEAVER Works</span>
+    </div>
+    <div class="panel-body">
+      <div class="arch-diagram">
+        <div class="arch-node">
+          <div class="arch-node-title">User Input</div>
+          <div class="arch-node-name">Topic + Context</div>
+          <div class="arch-node-desc">Math topic, skill level, everyday life context</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node gold-node">
+          <div class="arch-node-title">Cloud Agent Builder</div>
+          <div class="arch-node-name">Orchestration Agent</div>
+          <div class="arch-node-desc">Routes to story, quiz, or visual sub-agents</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node teal-node">
+          <div class="arch-node-title">Gemini 2.0</div>
+          <div class="arch-node-name">Story Generator</div>
+          <div class="arch-node-desc">Creates contextual math narrative + worked examples</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node gold-node">
+          <div class="arch-node-title">GitLab MCP</div>
+          <div class="arch-node-name">Progress Store</div>
+          <div class="arch-node-desc">Saves user streaks, quiz scores, story history to repo</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node teal-node">
+          <div class="arch-node-title">Output</div>
+          <div class="arch-node-name">Story + Quiz + Chat</div>
+          <div class="arch-node-desc">Adaptive multi-modal delivery</div>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:1rem;text-align:center;font-style:italic;">
+        Sub-agents: StoryWeaver · QuizCrafter · VisualAid · ProgressTracker · ContextualChat
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-badges">
+    <span class="footer-badge">Gemini 2.0 Flash</span>
+    <span class="footer-badge">Google Cloud Agent Builder</span>
+    <span class="footer-badge">GitLab MCP</span>
+    <span class="footer-badge">Hackathon 2025</span>
+  </div>
+  <p>MATHWEAVER — Every number has a story. Built for the <a href="#">Google Cloud Rapid Agent Hackathon</a>.<br/>
+  Open source · <a href="#">GitHub</a> · Made with ❤️ for learners everywhere.</p>
+</footer>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  level: 'foundation',
+  topic: '',
+  context: '',
+  storyText: '',
+  chatHistory: [],
+  quizHistory: [],
+  xp: 0,
+  storiesWoven: 0,
+  questionsAnswered: 0,
+  currentQuiz: null,
+  apiKey: ''
+};
+
+// Level-specific topic chips
+const TOPIC_CHIPS = {
+  foundation: [
+    { label: '🍎 Counting apples', value: 'counting objects 1 to 10' },
+    { label: '➕ Adding fingers', value: 'simple addition' },
+    { label: '🔷 Shapes', value: 'basic shapes circle square triangle' },
+    { label: '📏 Big & small', value: 'comparison size bigger smaller' }
+  ],
+  primary: [
+    { label: '🍕 Fractions', value: 'fractions and division' },
+    { label: '💰 Money maths', value: 'multiplication and money' },
+    { label: '📐 Area', value: 'area and perimeter' },
+    { label: '% Percentages', value: 'percentages and ratios' }
+  ],
+  secondary: [
+    { label: '📈 Quadratics', value: 'quadratic equations' },
+    { label: '🔢 Algebra', value: 'simultaneous equations' },
+    { label: '📊 Statistics', value: 'mean median mode standard deviation' },
+    { label: '🔺 Trigonometry', value: 'trigonometry sine cosine tangent' }
+  ],
+  advanced: [
+    { label: '∫ Calculus', value: 'integration and differentiation' },
+    { label: '🔀 Probability', value: 'Bayesian probability and conditional events' },
+    { label: '🧮 Linear Algebra', value: 'matrices and eigenvalues' },
+    { label: '∞ Limits', value: 'limits and continuity' }
+  ],
+  life: [
+    { label: '🏪 Market pricing', value: 'profit loss percentage markup' },
+    { label: '🏠 Mortgage maths', value: 'compound interest loans' },
+    { label: '🌾 Farming ratios', value: 'ratios and proportions for farming' },
+    { label: '✂️ Tailoring', value: 'measurement fractions for tailoring and fabric' }
+  ]
+};
+
+const LEVEL_LABELS = {
+  foundation: 'a very young child aged 4–6, use very simple words and fun animals or toys',
+  primary: 'a primary school student aged 8–12, use relatable everyday examples',
+  secondary: 'a secondary school student aged 13–17, connect to real life clearly',
+  advanced: 'a university student, use precise language and show deeper connections',
+  life: 'an adult learner in everyday life, use practical real-world situations like markets, cooking, sewing, farming, or business'
+};
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  const saved = localStorage.getItem('mathweaver_key');
+  if (saved) {
+    state.apiKey = saved;
+    document.getElementById('apiKeyInput').value = saved;
+    document.getElementById('apiNotice').style.display = 'none';
+  }
+  const savedXP = localStorage.getItem('mathweaver_xp');
+  if (savedXP) {
+    state.xp = parseInt(savedXP) || 0;
+    state.storiesWoven = parseInt(localStorage.getItem('mathweaver_stories')) || 0;
+    state.questionsAnswered = parseInt(localStorage.getItem('mathweaver_questions')) || 0;
+    updateProgress();
+  }
+  renderTopicChips();
+}
+
+function saveKey(val) {
+  state.apiKey = val.trim();
+  localStorage.setItem('mathweaver_key', state.apiKey);
+  if (state.apiKey.length > 10) {
+    document.getElementById('apiNotice').style.opacity = '0.5';
+  }
+}
+
+function setLevel(btn) {
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.level = btn.dataset.level;
+  renderTopicChips();
+}
+
+function renderTopicChips() {
+  const grid = document.getElementById('topicGrid');
+  grid.innerHTML = '';
+  (TOPIC_CHIPS[state.level] || []).forEach(chip => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-chip';
+    btn.textContent = chip.label;
+    btn.onclick = () => {
+      document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('topicInput').value = chip.value;
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function updateProgress() {
+  document.getElementById('storyCount').textContent = state.storiesWoven;
+  document.getElementById('questionCount').textContent = state.questionsAnswered;
+  document.getElementById('xpDisplay').textContent = state.xp;
+  document.getElementById('xpPill').textContent = state.xp + ' XP';
+  const pct = Math.min((state.xp / 500) * 100, 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  if (state.storiesWoven > 0) {
+    document.getElementById('streakBar').style.display = 'flex';
+    document.getElementById('streakText').textContent = `${state.storiesWoven} ${state.storiesWoven === 1 ? 'story' : 'stories'} woven!`;
+  }
+}
+
+// ============================================================
+// GEMINI API CALL
+// ============================================================
+async function callGemini(prompt, systemPrompt) {
+  const key = state.apiKey;
+  if (!key) {
+    alert('Please enter your Gemini API key first.');
+    return null;
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${key}`;
+  const body = {
+    contents: [{ parts: [{ text: (systemPrompt ? systemPrompt + '\n\n' : '') + prompt }] }],
+    generationConfig: { temperature: 0.85, maxOutputTokens: 1200 }
+  };
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  } catch (e) {
+    console.error('Gemini error:', e);
+    alert('Gemini API error: ' + e.message + '\n\nCheck your API key and try again.');
+    return null;
+  }
+}
+
+// ============================================================
+// WEAVE STORY
+// ============================================================
+async function weaveStory() {
+  const topic = document.getElementById('topicInput').value.trim();
+  const context = document.getElementById('contextInput').value.trim();
+  if (!topic) { alert('Please choose or type a math topic.'); return; }
+
+  state.topic = topic;
+  state.context = context;
+
+  document.getElementById('weaveBtn').disabled = true;
+  document.getElementById('storyPlaceholder').style.display = 'none';
+  document.getElementById('storyLoading').style.display = 'flex';
+  document.getElementById('storyContent').style.display = 'none';
+  document.getElementById('archPanel').style.display = 'none';
+
+  const levelDesc = LEVEL_LABELS[state.level];
+  const contextLine = context ? `The learner's everyday context is: "${context}". Weave this directly into the story.` : 'Use a general everyday African marketplace or family home setting.';
+
+  const storyPrompt = `You are MATHWEAVER, an expert at teaching mathematics through immersive storytelling. 
+Your audience is ${levelDesc}.
+Topic to teach: "${topic}"
+${contextLine}
+
+Write a SHORT, engaging math story (150–200 words) that:
+1. Starts with a vivid scene from everyday life
+2. Naturally introduces the math concept through character actions and dialogue
+3. Shows the math being used to solve a real problem in the story
+4. Ends with the math concept clearly stated in simple terms
+
+Then after the story, add:
+## The Maths Behind It
+A 2–3 sentence plain explanation of the concept.
+
+## Try It Yourself
+One simple worked example with numbers shown step-by-step like:
+[Example: 3 + 4 = 7]
+
+Format the worked example inside square brackets. Keep the total response under 300 words. Be warm, vivid, and encouraging.`;
+
+  const raw = await callGemini(storyPrompt);
+  document.getElementById('storyLoading').style.display = 'none';
+
+  if (!raw) { document.getElementById('weaveBtn').disabled = false; return; }
+
+  state.storyText = raw;
+  state.storiesWoven++;
+  state.xp += 20;
+  localStorage.setItem('mathweaver_stories', state.storiesWoven);
+  localStorage.setItem('mathweaver_xp', state.xp);
+  updateProgress();
+
+  renderStory(raw);
+  generateVisual(topic);
+  generateQuiz();
+  document.getElementById('weaveBtn').disabled = false;
+
+  // Seed chat context
+  state.chatHistory = [
+    { role: 'user', content: `I just learned about "${topic}" through this story:\n${raw.substring(0, 300)}...` },
+    { role: 'assistant', content: 'I have read your math story and I am ready to help you explore the concept deeper! What would you like to know?' }
+  ];
+}
+
+// ============================================================
+// RENDER STORY
+// ============================================================
+function renderStory(text) {
+  const el = document.getElementById('storyContent');
+  // Convert markdown-ish to HTML
+  let html = text
+    .replace(/## (.+)/g, '<h2>$1</h2>')
+    .replace(/### (.+)/g, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[(.+?)\]/g, '<div class="math-box">$1</div>')
+    .split('\n\n')
+    .filter(p => p.trim())
+    .map(p => p.startsWith('<h') || p.startsWith('<div') ? p : `<p>${p.trim()}</p>`)
+    .join('\n');
+  el.innerHTML = html;
+  el.style.display = 'block';
+  el.classList.add('fade-in');
+}
+
+// ============================================================
+// VISUAL AID
+// ============================================================
+async function generateVisual(topic) {
+  const visualPanel = document.getElementById('visualPanel');
+  const visualContent = document.getElementById('visualContent');
+
+  const prompt = `For the math topic "${topic}" at ${state.level} level, return ONLY a JSON array of 3–4 visual cards.
+Each card has: emoji (string), label (string, max 4 words), value (string showing a number or formula).
+Example: [{"emoji":"🍕","label":"Whole pizza","value":"1"},{"emoji":"✂️","label":"Cut in half","value":"1/2"},{"emoji":"🔢","label":"As decimal","value":"0.5"}]
+Return ONLY the JSON array, nothing else.`;
+
+  const raw = await callGemini(prompt);
+  if (!raw) return;
+
+  try {
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const cards = JSON.parse(clean);
+    visualContent.innerHTML = '';
+    cards.forEach(card => {
+      const div = document.createElement('div');
+      div.className = 'visual-card';
+      div.innerHTML = `<span class="visual-emoji">${card.emoji}</span><div class="visual-label">${card.label}</div><div class="visual-value">${card.value}</div>`;
+      visualContent.appendChild(div);
+    });
+    visualPanel.style.display = 'block';
+    visualPanel.classList.add('fade-in');
+  } catch (e) { /* silent */ }
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+async function generateQuiz() {
+  if (!state.topic) return;
+  document.getElementById('quizPlaceholder').style.display = 'none';
+  document.getElementById('quizLoading').style.display = 'flex';
+  document.getElementById('quizContent').style.display = 'none';
+
+  const prompt = `Create ONE multiple-choice quiz question about "${state.topic}" for ${LEVEL_LABELS[state.level]}.
+Return ONLY valid JSON in this exact format:
+{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}
+Where "correct" is the 0-based index of the right answer. Explanation should be 1–2 sentences in story/everyday terms.
+Return ONLY the JSON object, no other text.`;
+
+  const raw = await callGemini(prompt);
+  document.getElementById('quizLoading').style.display = 'none';
+  if (!raw) return;
+
+  try {
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const quiz = JSON.parse(clean);
+    state.currentQuiz = quiz;
+    renderQuiz(quiz);
+  } catch (e) { console.error('Quiz parse error', e); }
+}
+
+function renderQuiz(quiz) {
+  document.getElementById('quizQuestion').textContent = quiz.question;
+  const optDiv = document.getElementById('quizOptions');
+  optDiv.innerHTML = '';
+  quiz.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuiz(i, btn);
+    optDiv.appendChild(btn);
+  });
+  document.getElementById('quizExplanation').style.display = 'none';
+  document.getElementById('nextQuizBtn').style.display = 'none';
+  document.getElementById('quizContent').style.display = 'block';
+  document.getElementById('quizContent').classList.add('fade-in');
+}
+
+function answerQuiz(idx, btn) {
+  const quiz = state.currentQuiz;
+  const allBtns = document.querySelectorAll('.quiz-option');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (idx === quiz.correct) {
+    btn.classList.add('correct');
+    state.xp += 10;
+  } else {
+    btn.classList.add('wrong');
+    allBtns[quiz.correct].classList.add('correct');
+  }
+  state.questionsAnswered++;
+  localStorage.setItem('mathweaver_questions', state.questionsAnswered);
+  localStorage.setItem('mathweaver_xp', state.xp);
+  updateProgress();
+
+  document.getElementById('quizExplanation').textContent = quiz.explanation;
+  document.getElementById('quizExplanation').style.display = 'block';
+  document.getElementById('nextQuizBtn').style.display = 'block';
+}
+
+function nextQuestion() { generateQuiz(); }
+
+// ============================================================
+// CHAT
+// ============================================================
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  addChatMsg(msg, 'user');
+  document.getElementById('chatSendBtn').disabled = true;
+
+  state.chatHistory.push({ role: 'user', content: msg });
+
+  const sys = `You are MATHWEAVER's chat tutor. The learner is at ${state.level} level and just learned about "${state.topic}". 
+Their everyday context: "${state.context || 'general'}".
+Their story so far: ${state.storyText.substring(0, 200)}
+Answer their question in 2–4 sentences using a new mini-story or everyday analogy. Be warm and encouraging. Keep it brief.`;
+
+  const historyText = state.chatHistory.slice(-6).map(m => `${m.role === 'user' ? 'Student' : 'Tutor'}: ${m.content}`).join('\n');
+
+  const reply = await callGemini(historyText + '\nTutor:', sys);
+  document.getElementById('chatSendBtn').disabled = false;
+  if (!reply) return;
+
+  const clean = reply.replace(/^Tutor:\s*/i, '').trim();
+  state.chatHistory.push({ role: 'assistant', content: clean });
+  addChatMsg(clean, 'ai');
+  state.xp += 5;
+  localStorage.setItem('mathweaver_xp', state.xp);
+  updateProgress();
+}
+
+function addChatMsg(text, role) {
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role} fade-in`;
+  div.textContent = text;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+init();
+</script>
+</body>
+</html>
