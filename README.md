@@ -1,4 +1,7 @@
+Copyright © 2026 Kingsley Chukwuma. All rights reserved.
+
 # MATHWEAVER 📖✨
+
 ### *Every number has a story. Every story has a lesson.*
 
 > A Google Cloud Rapid Agent Hackathon 2025 submission.
