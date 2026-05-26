@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 8080;
 
 // ── Gemini helper ─────────────────────────────────────────────────────────────
 async function gemini(prompt, temperature = 0.85, maxTokens = 1200) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -36,7 +36,7 @@ async function gemini(prompt, temperature = 0.85, maxTokens = 1200) {
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-}
+}gemini-1.5-flash
 
 // ── GitLab MCP helpers ────────────────────────────────────────────────────────
 const GL_BASE = 'https://gitlab.com/api/v4';
