@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 8080;
 
 // ── Gemini helper ─────────────────────────────────────────────────────────────
 async function gemini(prompt, temperature = 0.85, maxTokens = 1200) {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
