@@ -1021,13 +1021,11 @@ async function callGemini(prompt, systemPrompt) {
   const key = state.apiKey;
   if (!key) { alert('Please enter your Gemini API key first.'); return null; }
   
-  // ✅ Use the stable, fast free-tier model
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
   
   const body = {
     contents: [{ parts: [{ text: (systemPrompt ? systemPrompt + '\n\n' : '') + prompt }] }],
     generationConfig: { temperature: 0.85, maxOutputTokens: 1200 },
-    // ✅ Explicit safety settings to prevent math content from being blocked
     safetySettings: [
       { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
       { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -1045,32 +1043,34 @@ async function callGemini(prompt, systemPrompt) {
       });
       const data = await res.json();
       
-      // 🔍 DEBUG: Check your browser console (F12) to see the raw response
-      console.log('Gemini Raw Response:', data);
-
       if (data.error) {
-        console.error('API Error:', data.error);
+        // ✅ SHOW THE EXACT ERROR IN THE ALERT
+        const errorMsg = `Error ${data.error.code}: ${data.error.message}`;
+        console.error(errorMsg);
+        
         if (data.error.code === 429) {
           await new Promise(r => setTimeout(r, attempt * 15000));
           continue;
         }
-        throw new Error(data.error.message);
+        throw new Error(errorMsg);
       }
       
-      // ✅ Handle cases where response is blocked or empty
       if (!data.candidates || data.candidates.length === 0) {
-        console.warn('Response blocked or empty. Check console for details.');
         return null;
       }
       
       return data.candidates[0].content?.parts?.[0]?.text || '';
     } catch (e) {
-      console.error(`Attempt ${attempt} failed:`, e);
-      if (attempt === 3) alert('Failed after 3 attempts. Check browser console for details.');
+      if (attempt === 3) {
+        // ✅ SHOW THE EXACT ERROR IN THE ALERT
+        alert(`FAILED: ${e.message}\n\nPlease tell me this error message.`);
+        return null;
+      }
     }
   }
   return null;
 }
+
 // ============================================================
 // WEAVE STORY
 // ============================================================
