@@ -1019,17 +1019,21 @@ function updateProgress() {
 // ============================================================
 async function callGemini(prompt, systemPrompt) {
   const key = state.apiKey;
-  if (!key) {
-    alert('Please enter your Gemini API key first.');
-    return null;
-  }
+  if (!key) { alert('Please enter your Gemini API key first.'); return null; }
   
-  // ✅ FIX 1: Use the current, supported free-tier model
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+  // ✅ Use the stable, fast free-tier model
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
   
   const body = {
     contents: [{ parts: [{ text: (systemPrompt ? systemPrompt + '\n\n' : '') + prompt }] }],
-    generationConfig: { temperature: 0.85, maxOutputTokens: 1200 }
+    generationConfig: { temperature: 0.85, maxOutputTokens: 1200 },
+    // ✅ Explicit safety settings to prevent math content from being blocked
+    safetySettings: [
+      { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+      { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+    ]
   };
 
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -1041,25 +1045,28 @@ async function callGemini(prompt, systemPrompt) {
       });
       const data = await res.json();
       
+      // 🔍 DEBUG: Check your browser console (F12) to see the raw response
+      console.log('Gemini Raw Response:', data);
+
       if (data.error) {
-        // ✅ FIX 2: Log the exact error to browser console so you can debug
-        console.error('Gemini API Error:', data.error);
-        
+        console.error('API Error:', data.error);
         if (data.error.code === 429) {
-          const wait = attempt * 15000;
-          console.log(`Rate limited. Retrying in ${wait/1000}s...`);
-          await new Promise(r => setTimeout(r, wait));
+          await new Promise(r => setTimeout(r, attempt * 15000));
           continue;
         }
         throw new Error(data.error.message);
       }
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } catch (e) {
-      console.error(`Fetch attempt ${attempt} failed:`, e); // ✅ FIX 2 continued
-      if (attempt === 3) {
-        alert('MATHWEAVER could not reach Gemini.\n\nOpen Browser Console (F12) to see the exact error, or check your API key & billing.');
+      
+      // ✅ Handle cases where response is blocked or empty
+      if (!data.candidates || data.candidates.length === 0) {
+        console.warn('Response blocked or empty. Check console for details.');
         return null;
       }
+      
+      return data.candidates[0].content?.parts?.[0]?.text || '';
+    } catch (e) {
+      console.error(`Attempt ${attempt} failed:`, e);
+      if (attempt === 3) alert('Failed after 3 attempts. Check browser console for details.');
     }
   }
   return null;
