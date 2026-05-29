@@ -1023,7 +1023,10 @@ async function callGemini(prompt, systemPrompt) {
     alert('Please enter your Gemini API key first.');
     return null;
   }
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  
+  // ✅ FIX 1: Use the current, supported free-tier model
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+  
   const body = {
     contents: [{ parts: [{ text: (systemPrompt ? systemPrompt + '\n\n' : '') + prompt }] }],
     generationConfig: { temperature: 0.85, maxOutputTokens: 1200 }
@@ -1037,7 +1040,11 @@ async function callGemini(prompt, systemPrompt) {
         body: JSON.stringify(body)
       });
       const data = await res.json();
+      
       if (data.error) {
+        // ✅ FIX 2: Log the exact error to browser console so you can debug
+        console.error('Gemini API Error:', data.error);
+        
         if (data.error.code === 429) {
           const wait = attempt * 15000;
           console.log(`Rate limited. Retrying in ${wait/1000}s...`);
@@ -1048,8 +1055,9 @@ async function callGemini(prompt, systemPrompt) {
       }
       return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     } catch (e) {
+      console.error(`Fetch attempt ${attempt} failed:`, e); // ✅ FIX 2 continued
       if (attempt === 3) {
-        alert('MATHWEAVER could not reach Gemini after 3 attempts.\n\nTry again in 1 minute, or check your API key.');
+        alert('MATHWEAVER could not reach Gemini.\n\nOpen Browser Console (F12) to see the exact error, or check your API key & billing.');
         return null;
       }
     }
